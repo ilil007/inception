@@ -1,0 +1,81 @@
+services:
+
+  nginx:
+    build:
+      context: ./requirements/nginx_proxy
+      dockerfile: Dockerfile
+    container_name: nginx
+    depends_on:
+      - wordpress
+    ports:
+      - "8443:443"
+    restart: unless-stopped
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - inception
+
+  mariadb:
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
+    container_name: mariadb
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - WP_DB_NAME=${WP_DB_NAME}
+      - WP_DB_USER=${WP_DB_USER}
+      - WP_DB_PASS=${WP_DB_PASS}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - inception
+    
+  wordpress:
+    build:
+      context: ./requirements/php_wordpress
+      dockerfile: Dockerfile
+    container_name: wordpress
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=mariadb
+      - WP_DB_NAME=${WP_DB_NAME}
+      - WP_DB_USER=${WP_DB_USER}
+      - WP_DB_PASS=${WP_DB_PASS}
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - WP_TITLE=${WP_TITLE}
+      - WP_ADMIN_USER=${WP_ADMIN_USER}
+      - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
+      - WP_ADMIN_PASS=${WP_ADMIN_PASS}
+      - WP_NORMAL_USER=${WP_NORMAL_USER}
+      - WP_NORMAL_EMAIL=${WP_NORMAL_EMAIL}
+      - WP_NORMAL_PASS=${WP_NORMAL_PASS}
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - inception
+
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/liliu/data/mariadb
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/liliu/data/wordpress
+
+networks:
+  inception:
+    driver: bridge
