@@ -1,7 +1,10 @@
-COMPOSE_FILE=srcs/docker-compose.yml
-LOGIN=liliu
-DATA_DIR=/home/$(LOGIN)/data
-VOLUMES=$(DATA_DIR)/mariadb $(DATA_DIR)/wordpress
+.ONESHELL:
+SHELL 			:= /bin/sh
+
+COMPOSE_FILE	:= srcs/docker-compose.yml
+LOGIN			:= liliu
+DATA_DIR		:= /home/$(LOGIN)/data
+VOLUMES			:= $(DATA_DIR)/mariadb $(DATA_DIR)/wordpress
 
 all: create-volumes up
 
@@ -42,6 +45,7 @@ fclean: down
 	docker system prune -af --volumes
 	-rm -rf $(DATA_DIR) 2>/dev/null || true
 
+# Cleaning before evaluation to ensure a clean environment for testing
 evaluation:
 	-@docker stop $$(docker ps -qa) 2>/dev/null || true
 	-@docker rm $$(docker ps -qa) 2>/dev/null || true

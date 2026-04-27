@@ -2,13 +2,11 @@
 
 set -e
 
-echo "Waiting for MariaDB to be ready..."
+echo "Waiting for MariaDB "
 until mysql -h${DB_HOST} -u${WP_DB_USER} -p${WP_DB_PASS} ${WP_DB_NAME} -e "SELECT 1" >/dev/null 2>&1; do
-echo "MariaDB is unavailable - sleeping"
+echo "."
 sleep 3
 done
-
-echo "MariaDB is up - continuing..."
 
 cd /var/www/html
 
