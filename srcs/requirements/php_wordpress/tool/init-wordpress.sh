@@ -40,16 +40,19 @@ else
 
         echo "Core installation complete."
 
+    fi
+fi
+
+if wp core is-installed --allow-root 2>/dev/null; then
+    if ! wp user get "${WP_NORMAL_USER}" --field=ID --allow-root >/dev/null 2>&1; then
         wp user create "${WP_NORMAL_USER}" "${WP_NORMAL_EMAIL}" \
             --user_pass="${WP_NORMAL_PASS}" \
             --role=editor \
             --allow-root
-
-        echo "Standard WP user added."
     fi
-
-    chown -R www-data:www-data /var/www/html
-    echo "Access permissions verified."
 fi
+
+chown -R www-data:www-data /var/www/html
+echo "Access permissions verified."
 
 exec php-fpm82 -F
