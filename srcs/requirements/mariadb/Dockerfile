@@ -1,16 +1,14 @@
-FROM debian:bookworm-slim
+FROM alpine:3.19
 
-RUN apt-get update && apt-get install -y \
-    mariadb-server \
-    mariadb-client \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk add --no-cache mariadb mariadb-client \
+    && mkdir -p /run/mysqld /var/lib/mysql \
+    && chown -R mysql:mysql /run/mysqld /var/lib/mysql
 
-COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+COPY conf/50-server.cnf /etc/my.cnf.d/mariadb-server.cnf
+
 COPY tools/init-db.sh /usr/local/bin/init-db.sh
 
-RUN chmod +x /usr/local/bin/init-db.sh \
-    && mkdir -p /var/run/mysqld \
-    && chown -R mysql:mysql /var/run/mysqld /var/lib/mysql
+RUN chmod +x /usr/local/bin/init-db.sh
 
 EXPOSE 3306
 

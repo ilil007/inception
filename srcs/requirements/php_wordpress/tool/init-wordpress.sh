@@ -1,21 +1,20 @@
-#!/bin/bash
-
+#!/bin/sh
 set -e
 
-echo "Waiting for MariaDB "
-until mysql -h${DB_HOST} -u${WP_DB_USER} -p${WP_DB_PASS} ${WP_DB_NAME} -e "SELECT 1" >/dev/null 2>&1; do
-echo "."
-sleep 3
+echo "Ensuring MariaDB is accessible..."
+while ! mysql -h${DB_HOST} -u${WP_DB_USER} -p${WP_DB_PASS} ${WP_DB_NAME} -e "SELECT 1" >/dev/null 2>&1; do
+    echo "waiting for DB..."
+    sleep 2
 done
 
 cd /var/www/html
 
 if wp core is-installed --allow-root 2>/dev/null; then
-    echo "WordPress is already installed - skipping installation."
+    echo "WP setup skipped (already done)."
 else
-    echo "Installing WordPress for the first time..."
+    echo "Running first-time WordPress setup..."
 
-    wp core download --allow-root || echo "WordPress files might already exist."
+    wp core download --allow-root || echo "WP core files exist already."
 
     if [ ! -f "wp-config.php" ]; then
         wp config create \
@@ -26,31 +25,31 @@ else
             --force \
             --allow-root
 
-        echo "Database configured successfully."
+        echo "Created wp-config.php"
     fi
 
     if ! wp core is-installed --allow-root 2>/dev/null; then
         wp core install \
             --url=https://${DOMAIN_NAME} \
             --title="${WP_TITLE}" \
-            --admin_user=${WP_ADMIN_USER} \
-            --admin_password=${WP_ADMIN_PASS} \
-            --admin_email=${WP_ADMIN_EMAIL} \
+            --admin_user="${WP_ADMIN_USER}" \
+            --admin_password="${WP_ADMIN_PASS}" \
+            --admin_email="${WP_ADMIN_EMAIL}" \
             --skip-email \
             --allow-root
 
-        echo "WordPress core installed successfully."
+        echo "Core installation complete."
 
-        wp user create ${WP_NORMAL_USER} ${WP_NORMAL_EMAIL} \
-            --user_pass=${WP_NORMAL_PASS} \
-            --role=author \
+        wp user create "${WP_NORMAL_USER}" "${WP_NORMAL_EMAIL}" \
+            --user_pass="${WP_NORMAL_PASS}" \
+            --role=editor \
             --allow-root
 
-        echo "Normal user created successfully."
+        echo "Standard WP user added."
     fi
 
     chown -R www-data:www-data /var/www/html
-
-    echo "WordPress installed successfully."
+    echo "Access permissions verified."
 fi
-exec php-fpm8.2 -F
+
+exec php-fpm82 -F

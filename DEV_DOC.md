@@ -7,7 +7,7 @@
 - **Tools**: `make`, `docker`, and `docker-compose` (or the `docker compose` plugin).
 
 ### Host Configuration
-To correctly route traffic for the local domain, ensure the domain name maps to `localhost` in your `/etc/hosts` file. Add the following line:
+To properly resolve the local domain, ensure the domain name maps to `localhost` in your `/etc/hosts` file. Add the following line:
 ```
 127.0.0.1 liliu.42.fr
 ```
@@ -33,15 +33,15 @@ WP_USER_EMAIL=user@liliu.42.fr
 ```
 
 ## Building and Launching the Project
-The project uses a `Makefile` at the root directory to orchestrate the `srcs/docker-compose.yml` configuration:
-- **Build and Start**: Run `make` or `make all`. This triggers docker-compose to build the container images from local Dockerfiles and starts the environment in a detached state.
+A `Makefile` located at the root directory is used to manage the `srcs/docker-compose.yml` setup:
+- **Build and Start**: Run `make` or `make all`. This builds images from the provided Dockerfiles and starts all containers in detached mode.
 - **Stop and Remove Containers**: Run `make clean` or `make down`. 
 - **Full Reset**: Run `make fclean`. This will stop everything, remove all networks, images, and wipe the persistent volumes.
-- **Restart**: Run `make re` (combines `fclean` + `all`).
+- **Restart**: Run `make re` (equivalent to `fclean` + `all`).
 
 ## Managing Containers and Volumes
 
-- **View Logs**: To debug initialization scripts or runtime errors, use:
+- **View Logs**: For debugging startup scripts or runtime issues:
   ```bash
   docker compose -f srcs/docker-compose.yml logs -f <service_name>
   ```
@@ -56,6 +56,6 @@ The project uses a `Makefile` at the root directory to orchestrate the `srcs/doc
   ```
 
 ## Data Storage and Persistence
-To ensure that database entries and website media are not lost when containers are recreated, data persists using Docker volumes bound to host machine directories:
+To prevent data loss when containers are recreated, persistent storage is handled via Docker volumes mapped to directories on the host machine:
 - **MariaDB Data**: Stored persistently on the host at `/home/login/data/mariadb` and mounted into the database container at `/var/lib/mysql`. This safeguards posts, site configuration, and users.
-- **WordPress Files**: Stored persistently on the host at `/home/login/data/wordpress` and mounted to the web and PHP containers at `/var/www/wordpress`. This safeguards downloaded themes, plugins, and uploaded structural files.
+- **WordPress Files**: Stored persistently on the host at `/home/login/data/wordpress` and mounted to the web and PHP containers at `/var/www/wordpress`. This preserves themes, plugins, and uploaded media files.
