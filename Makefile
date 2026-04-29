@@ -27,7 +27,7 @@ stop:
 	docker compose -f $(COMPOSE_PATH) stop
 
 down:
-	docker compose -f $(COMPOSE_PATH) down
+	docker compose -f $(COMPOSE_PATH) down --rmi all --volumes --remove-orphans
 
 wp-restart:
 	docker compose -f $(COMPOSE_PATH) build wordpress
@@ -36,13 +36,12 @@ wp-restart:
 restart: stop start
 
 clean: down
-	docker system prune -af --volumes
+	docker system prune -af --volumes 
 
 fclean: down
 	-docker run --rm -v $(BASE_DIR):/data -e HOST_UID=$$(id -u $(LOGIN)) -e HOST_GID=$$(id -g $(LOGIN)) alpine chown -R $$(id -u $(LOGIN)):$$(id -g $(LOGIN)) /data 2>/dev/null
 	docker compose -f $(COMPOSE_PATH) down --rmi all --volumes --remove-orphans
 	docker system prune -af --volumes
-	-rm -rf $(BASE_DIR) 2>/dev/null || true
 
 evaluation:
 	-@docker stop $$(docker ps -qa) 2>/dev/null || true
