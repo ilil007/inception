@@ -1,6 +1,8 @@
 services:
   mariadb:
     container_name: mariadb
+    image: mariadb
+    pull_policy: never
     build:
       context: ./requirements/mariadb
       dockerfile: Dockerfile
@@ -14,6 +16,8 @@ services:
 
   wordpress:
     container_name: wordpress
+    image: wordpress
+    pull_policy: never
     build:
       context: ./requirements/wordpress
       dockerfile: Dockerfile
@@ -29,6 +33,8 @@ services:
 
   nginx:
     container_name: nginx
+    image: nginx
+    pull_policy: never
     build:
       context: ./requirements/nginx
       dockerfile: Dockerfile
