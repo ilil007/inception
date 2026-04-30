@@ -12,13 +12,13 @@ setup-volumes:
 	@mkdir -p $(VM_DIRS)
 
 up:
-	docker compose -f $(COMPOSE_PATH) up -d
+	docker compose -f $(COMPOSE_PATH) up -d --pull never
 
 build:
-	docker compose -f $(COMPOSE_PATH) build
+	docker compose -f $(COMPOSE_PATH) build --pull=false
 
 rebuild:
-	docker compose -f $(COMPOSE_PATH) up -d --build
+	docker compose -f $(COMPOSE_PATH) up -d --build --pull never
 
 start:
 	docker compose -f $(COMPOSE_PATH) start
@@ -30,8 +30,8 @@ down:
 	docker compose -f $(COMPOSE_PATH) down --rmi all --volumes --remove-orphans
 
 wp-restart:
-	docker compose -f $(COMPOSE_PATH) build wordpress
-	docker compose -f $(COMPOSE_PATH) up -d wordpress
+	docker compose -f $(COMPOSE_PATH) build --pull=false wordpress
+	docker compose -f $(COMPOSE_PATH) up -d --pull never wordpress
 
 restart: stop start
 
